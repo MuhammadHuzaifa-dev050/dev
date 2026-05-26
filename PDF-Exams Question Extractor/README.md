@@ -19,19 +19,25 @@ pip install -r requirements.txt
 
 ## Usage
 
-Run the script by passing the path of your exam paper PDF file:
+You can process a single PDF, multiple PDFs, or let the script auto-process all PDFs in the current directory:
 
+### Process a Single File
 ```bash
 python extract_exam_questions.py <path_to_your_exam_paper.pdf>
 ```
 
-### Example
-
+### Process Multiple Files
 ```bash
-python extract_exam_questions.py 9709_s21_qp_12.pdf
+python extract_exam_questions.py exam1.pdf exam2.pdf exam3.pdf
 ```
 
-This will create a folder named `9709_s21_qp_12/` containing individual screenshots of every question and subpart.
+### Process All PDFs in Current Directory
+If you run the script without any arguments, it will automatically detect and process all `.pdf` files present in the current folder:
+```bash
+python extract_exam_questions.py
+```
+
+Each PDF file processed will have its own output folder named after the PDF stem (e.g. `9709_s21_qp_12/`) containing its respective cropped question screenshots.
 
 ## License
 

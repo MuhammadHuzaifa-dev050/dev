@@ -256,38 +256,39 @@ if __name__ == "__main__":
     print("Exam Paper Question Extractor Run")
     print("=================================")
     
-    # Parse PDF path from command-line argument if provided
+    # Parse PDF paths from command-line arguments if provided
     if len(sys.argv) > 1:
-        INPUT_PDF = sys.argv[1]
+        INPUT_PDFS = sys.argv[1:]
     else:
-        # Fallback to the first PDF in the current directory if no argument is provided
-        pdf_files = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
-        if pdf_files:
-            INPUT_PDF = pdf_files[0]
-            print(f"No PDF file specified. Defaulting to found PDF: '{INPUT_PDF}'")
+        # Fallback to all PDF files in the current directory if no argument is provided
+        INPUT_PDFS = [f for f in os.listdir('.') if f.lower().endswith('.pdf')]
+        if INPUT_PDFS:
+            print(f"No PDF files specified. Found {len(INPUT_PDFS)} PDF(s) in the current directory.")
         else:
-            print("Error: No PDF file specified, and no PDF file found in this directory.")
-            print("Usage: python extract_exam_questions.py <pdf_filename>")
+            print("Error: No PDF files specified, and no PDF files found in this directory.")
+            print("Usage: python extract_exam_questions.py <pdf_file1> [pdf_file2 ...]")
             sys.exit(1)
 
-    # Check if the chosen input file exists
-    if not os.path.exists(INPUT_PDF):
-        print(f"Error: Could not find input file '{INPUT_PDF}'.")
-        sys.exit(1)
+    for pdf_path in INPUT_PDFS:
+        # Check if the chosen input file exists
+        if not os.path.exists(pdf_path):
+            print(f"\nError: Could not find input file '{pdf_path}'. Skipping...")
+            continue
 
-    # Name the output directory after the PDF file (removing .pdf extension)
-    OUTPUT_DIRECTORY = Path(INPUT_PDF).stem
+        print(f"\nProcessing: {pdf_path}")
+        print("-" * (12 + len(pdf_path)))
 
-    try:
-        results = extract_questions_from_pdf(
-            pdf_path=INPUT_PDF,
-            output_dir=OUTPUT_DIRECTORY,
-            dpi=RENDER_DPI,
-            vertical_padding=PADDING,
-            poppler_path=POPPLER_BIN_PATH
-        )
-        print(f"Successfully processed exam paper. Extracted images:")
-        for img in results:
-            print(f" - {img}")
-    except Exception as err:
-        print(f"Execution failed: {err}")
+        # Name the output directory after the PDF file (removing .pdf extension)
+        OUTPUT_DIRECTORY = Path(pdf_path).stem
+
+        try:
+            results = extract_questions_from_pdf(
+                pdf_path=pdf_path,
+                output_dir=OUTPUT_DIRECTORY,
+                dpi=RENDER_DPI,
+                vertical_padding=PADDING,
+                poppler_path=POPPLER_BIN_PATH
+            )
+            print(f"Successfully processed {pdf_path}. Extracted {len(results)} images to '{OUTPUT_DIRECTORY}'.")
+        except Exception as err:
+            print(f"Execution failed for {pdf_path}: {err}")
